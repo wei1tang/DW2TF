@@ -39,6 +39,8 @@ class WeightsReader:
         if self.eof:
             return None
         end_point = self.offset + 4 * size
+
+        print("end_point " + str(end_point) + "    " + "self.size " + str(self.size) + " self.offset " + str(self.offset))
         assert end_point <= self.size, 'Over-read {}'.format(self.path)
 
         float32_1d_array = np.memmap(
@@ -47,6 +49,13 @@ class WeightsReader:
             dtype='({})float32,'.format(size)
         )
 
+        array_flatten = float32_1d_array.flatten()
+        array_list = list(array_flatten)
+        array_list = [ ("%.6f" % item) for item in array_list  ]
+
+        with open("dw2tf_weight.txt", 'a+') as f:
+            f.write(str(array_list) + '\n')
+        # import pdb; pdb.set_trace()
         self.offset = end_point
         if end_point == self.size:
             self.eof = True

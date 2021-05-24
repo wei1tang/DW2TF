@@ -126,10 +126,17 @@ def cfg_avgpool(B, H, W, C, net, param, weights_walker, stack, output_index, sco
 def cfg_route(B, H, W, C, net, param, weights_walker, stack, output_index, scope, training, const_inits, verbose):
     if not isinstance(param["layers"], list):
         param["layers"] = [param["layers"]]
+    
     net_index = [int(x) for x in param["layers"]]
     nets = [stack[x] for x in net_index]
+    
+    if 'groups' in param.keys():
+        groups = int(param["groups"])
+        group_id = int(param["group_id"])
+        net = tf.split(nets[0],groups,axis=-1)[group_id]
+    else:
+        net = tf.concat(nets, axis=-1, name=scope)
 
-    net = tf.concat(nets, axis=-1, name=scope)
     return net
 
 
